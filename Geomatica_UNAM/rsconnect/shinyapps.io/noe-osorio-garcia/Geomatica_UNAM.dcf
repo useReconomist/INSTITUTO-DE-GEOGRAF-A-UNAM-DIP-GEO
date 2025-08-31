@@ -1,0 +1,12 @@
+name: Geomatica_UNAM
+title: Geomatica_UNAM
+username: noe-osorio-garcia
+account: noe-osorio-garcia
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 15314515
+bundleId: 10843670
+url: https://noe-osorio-garcia.shinyapps.io/Geomatica_UNAM/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
