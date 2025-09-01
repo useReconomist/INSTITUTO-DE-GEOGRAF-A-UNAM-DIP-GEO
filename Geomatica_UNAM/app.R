@@ -9,10 +9,30 @@ library(shinyWidgets)
 library(shinyjs)
 library(bslib)
 
-
+t1 = read_rds("t1.rds")
 
 ui <- page_sidebar(
-  title = "Espacios de Excepción - Análisis Territorial",
+  title = div(
+    tags$a(
+      href = "https://www.geografia.unam.mx/geoigg/",
+      target = "_blank",
+      img(src = "ig_logo.svg", height = "30px"),
+      class = "logo-link"
+    ),
+    tags$strong("Espacios de Excepción - Análisis Territorial"),
+    style = "display: flex; align-items: center; gap: 10px;"
+  ),
+  tags$head(
+    tags$style(HTML("
+      .logo-link {
+        text-decoration: none;
+        transition: opacity 0.3s;
+      }
+      .logo-link:hover {
+        opacity: 0.8;
+      }
+    "))
+  ),
   useShinyjs(),
   sidebar = sidebar(
     width = 300,
@@ -125,7 +145,13 @@ server <- function(input, output, session) {
                  icon("book-open"), " Introducción: Los Espacios de Excepción"
                ),
                card_body(
-                 h4("¿Qué son los espacios de excepción?", class = "text-primary"),
+                 p("De acuerdo al portal de datos abiertos de la CDMX, ", 
+                   tags$a(href = "https://datos.cdmx.gob.mx/dataset/victimas-en-carpetas-de-investigacion-fgj", 
+                          target = "_blank",
+                          "Víctimas en carpetas de investigación FGJ"), 
+                   ", existen 315 delitos en 16 categorías. Existen delitos que a través del tiempo presentan cierta tendencia ya sea por la capacidad de denunciar (formas más eficientes) o porque las problemáticas se vuelven más complejas de detener
+                   algunos ejemplos son: la categoría de Delitos de bajo impacto, Hechos no delictivos y VIolación"),
+                 gt::gt_output(outputId = "t_1"),
                  p("Los", strong("espacios de excepción"), "son territorios donde se suspende el orden jurídico normal, creando zonas ambiguas donde la ley se aplica precisamente a través de su", em("no-aplicación"), "."),
                  
                  br(),
@@ -471,6 +497,33 @@ server <- function(input, output, session) {
              )
            )
     )
+  })
+  
+  output$t_1=render_gt({
+    t1 %>%
+      arrange(desc(`Año 2023`)) %>%
+      gt(rowname_col = "categoria_delito") %>%
+      fmt_integer(columns = starts_with("Año")) %>%
+      tab_style(
+        style = cell_text(weight = "bold"),
+        locations = cells_stub(  # Cambio clave: usar cells_stub() en lugar de cells_body()
+          rows = categoria_delito %in% c("DELITO DE BAJO IMPACTO",
+                                         "HECHO NO DELICTIVO",
+                                         "VIOLACIÓN")
+        )
+      ) %>%
+      tab_stubhead(label = md("**Categoría delito**")) %>%
+      cols_nanoplot(
+        columns = starts_with("Año"),
+        autohide = FALSE,
+        new_col_name = "nanoplots",
+        new_col_label = md("*Progression*")
+      ) %>%
+      tab_spanner(
+        label = "Víctimas por año",
+        columns = starts_with("Año")
+      ) %>%
+      cols_align(align = "right", columns = nanoplots)
   })
   
   output$mapa_historico = renderLeaflet({
