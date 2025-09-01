@@ -401,16 +401,36 @@ server <- function(input, output, session) {
                          div(class = "alert alert-success",
                              h5("Transparencia por convicción, no por obligación."),
                              p("Cada algoritmo, cada gráfico y cada conclusión de esta investigación puede ser inspeccionada, cuestionada y mejorada. Creemos que el conocimiento científico debe ser accesible, verificable y construido colaborativamente, permitiendo que cualquier persona pueda revisar, replicar y perfeccionar nuestro trabajo."),
-                             p("Usamos software libre porque la ciencia libre construye sociedades libres. Porque la ciencia que no se puede verificar, no es ciencia."),
-                             p("Consulta el código completo ", 
-                               a(href = "https://github.com/useReconomist", 
-                                 target = "_blank",
-                                 icon("github", lib = "font-awesome"),
-                                 style = "text-decoration: none; margin-right: 10px;")),
-                             p("¿Dudas? Contacta a los autores ",
-                               a(href = "mailto:noe.osorio@aiesec.net,ecostat.nog@gmail.com", 
-                                 icon("envelope", lib = "font-awesome"),
-                                 style = "text-decoration: none; margin-right: 5px;"))
+                             # p("Usamos software libre porque la ciencia libre construye sociedades libres. Porque la ciencia que no se puede verificar, no es ciencia."),
+                             
+                             # Sección del código fuente
+                             div(class = "d-flex align-items-center flex-wrap mb-3",
+                                 div(class = "me-3 mb-2",
+                                     p(class = "mb-0", "Consulta el código completo:"),
+                                     a(href = "https://github.com/useReconomist/INSTITUTO-DE-GEOGRAF-A-UNAM-DIP-GEO", 
+                                       target = "_blank",
+                                       class = "btn btn-outline-dark btn-sm",
+                                       icon("github", lib = "font-awesome"),
+                                       " Ver en GitHub")
+                                 ),
+                                 div(class = "mb-2",
+                                     p(class = "mb-1 small", "Escanea el código QR:"),
+                                     img(src = "qr.svg", 
+                                         style = "max-width: 90px; height: auto;",
+                                         alt = "Código QR para acceder al repositorio")
+                                 )
+                             ),
+                             
+                             # Sección de contacto
+                             div(class = "border-top pt-2",
+                                 p(class = "mb-0",
+                                   "¿Dudas? Contacta a los autores: ",
+                                   a(href = "mailto:noe.osorio@aiesec.net,ecostat.nog@gmail.com", 
+                                     class = "text-decoration-none",
+                                     icon("envelope", lib = "font-awesome"),
+                                     " Enviar correo")
+                                 )
+                             )
                          )
                      ),
                      
