@@ -8,8 +8,10 @@ library(shiny)
 library(shinyWidgets)
 library(shinyjs)
 library(bslib)
+library(gt)
 
 t1 = read_rds("t1.rds")
+
 
 ui <- page_sidebar(
   title = div(
@@ -35,16 +37,16 @@ ui <- page_sidebar(
   ),
   useShinyjs(),
   sidebar = sidebar(
-    width = 300,
+    width = 280,
     # Navegación secuencial tipo storytelling
     radioButtons("seccion", 
                  "Navegación:",
                  choices = list(
-                   "1. Introducción Teórica" = "intro",
-                   "2. El Concepto de Agamben" = "concepto", 
+                   "1. Introducción" = "intro",
+                   "2. El Conceptos" = "concepto", 
                    "3. Datos y Evidencia" = "datos",
-                   "4. Análisis Territorial" = "analisis",
-                   "5. Mecanismos de Perpetuación" = "mecanismos",
+                   "4. Análisis Espacial" = "analisis",
+                   "5. Conclusiones" = "mecanismos",
                    "6. Metodología y Contacto" = "contacto"
                  ),
                  selected = "intro"),
@@ -150,17 +152,11 @@ server <- function(input, output, session) {
                           target = "_blank",
                           "Víctimas en carpetas de investigación FGJ"), 
                    ", existen 315 delitos en 16 categorías. Existen delitos que a través del tiempo presentan cierta tendencia ya sea por la capacidad de denunciar (formas más eficientes) o porque las problemáticas se vuelven más complejas de detener
-                   algunos ejemplos son: la categoría de Delitos de bajo impacto, Hechos no delictivos y VIolación"),
+                   algunos ejemplos son: las categorías de Delitos como 'Bajo impacto', 'Hechos no delictivos' y 'Violación' exhiben tendencias temporales que sugieren la existencia de ventanas de oportunidad criminal."),
                  gt::gt_output(outputId = "t_1"),
-                 p("Los", strong("espacios de excepción"), "son territorios donde se suspende el orden jurídico normal, creando zonas ambiguas donde la ley se aplica precisamente a través de su", em("no-aplicación"), "."),
-                 
-                 br(),
-                 div(
-                   class = "alert alert-info",
-                   icon("lightbulb"), " ",
-                   strong("Concepto clave:"), " No es ausencia total de ley, sino una inclusión a través de la exclusión."
-                 ),
-                 
+                 p("Los", strong("espacios de excepción"), "no solo se manifiestan geográficamente, sino también temporalmente. Los patrones de criminalidad revelan cómo ciertos momentos del día, días de la semana y épocas del año se convierten en 'tiempos de excepción' donde la vulnerabilidad ciudadana se intensifica."),   
+                 p("La distribución de los eventos delictivos sigue patrones estacionales, horarios y semanales específicos, revelando cómo el tiempo se convierte en una dimensión adicional de los espacios de excepción - creando 'cronotopos de vulnerabilidad'"),
+                 selectInput(inputId = "id_delitos",choices = c(t1$categoria_delito),label = "Selecciona un delito",multiple = FALSE,selected = "VIOLACIÓN"),
                  h5("Características principales:"),
                  tags$ul(
                    tags$li("Suspensión temporal del orden jurídico"),
@@ -298,36 +294,85 @@ server <- function(input, output, session) {
            
            # Sección 4: Análisis
            "analisis" = div(
-             card(
-               card_header(
-                 icon("map"), " Análisis Territorial"
+             style = "height: 100vh;",
+             # Botones de navegación en la parte superior
+             div(
+               class = "d-flex justify-content-between mb-2",
+               actionButton("back_analisis", "← Anterior", class = "btn-secondary"),
+               actionButton("next_analisis", "Siguiente: Mecanismos →", class = "btn-primary")
+             ),
+             # Layout de dos columnas
+             div(
+               class = "row g-2",
+               style = "height: calc(100vh - 80px);",
+               # Columna 1: Mapa en card con botón flotante (50% del ancho)
+               div(
+                 class = "col-6",
+                 style = "height: 100%; position: relative;",
+                 card(
+                   full_screen = TRUE,
+                   card_header(
+                     icon("map"), " Análisis Territorial"
+                   ),
+                   card_body(
+                     # Botón calcular flotante en esquina superior derecha
+                     div(
+                       style = "position: absolute; top: 10px; right: 15px; z-index: 1000;",
+                       actionButton("calcular", "Calcular", class = "btn-success")
+                     ),
+                     leafletOutput(outputId = "mapa_historico", height = "100%"),
+                     class = "p-0",
+                     style = "position: relative;"
+                   ),
+                   style = "height: 100%;"
+                 )
                ),
-               card_body(
-                 h4("Mapeo de Espacios de Excepción", class = "text-primary"),
-                 p("El análisis territorial revela patrones espaciales que confirman la teoría de Agamben:"),
-                 
-                 div(class = "alert alert-success",
-                     h6("Hallazgos principales:"),
-                     tags$ul(
-                       tags$li("Concentración geográfica de la excepción"),
-                       tags$li("Patrones de continuidad territorial"),
-                       tags$li("Relación con infraestructura urbana"),
-                       tags$li("Correlación con variables socioeconómicas")
-                     )
-                 ),
-                 
-                 # Placeholder para mapas y análisis
-                 leafletOutput(outputId = "mapa_historico"),
-                 br(),
+               # Columna 2: Solo gráficos en cards (50% del ancho)
+               div(
+                 class = "col-6",
+                 style = "height: 100%;",
                  div(
-                   class = "d-flex justify-content-between",
-                   actionButton("back_analisis", "← Anterior", class = "btn-secondary"),
-                   actionButton("next_analisis", "Siguiente: Mecanismos →", class = "btn-primary")
+                   style = "height: 100%; display: flex; flex-direction: column; gap: 0px;",
+                   # Card Gráfico 1
+                   card(
+                     full_screen = TRUE,
+                     card_header(
+                       icon("chart-line"), " Tendencia Temporal"
+                     ),
+                     card_body(
+                       plotOutput("grafico1", height = "100%"),
+                       class = "p-0"
+                     ),
+                     style = "height: 33%; flex-shrink: 0; margin-bottom: 0; margin-top: 0;" # Eliminamos márgenes
+                   ),
+                   # Card Gráfico 2
+                   card(
+                     full_screen = TRUE,
+                     card_header(
+                       icon("chart-bar"), " Distribución"
+                     ),
+                     card_body(
+                       plotOutput("grafico2", height = "100%"),
+                       class = "p-0"
+                     ),
+                     style = "height: 33%; flex-shrink: 0; margin-bottom: 0; margin-top: 0;" # Eliminamos márgenes
+                   ),
+                   # Card Gráfico 3
+                   card(
+                     full_screen = TRUE,
+                     card_header(
+                       icon("scatter-chart"), " Correlación"
+                     ),
+                     card_body(
+                       plotOutput("grafico3", height = "100%"),
+                       class = "p-0"
+                     ),
+                     style = "height: 33%; flex-shrink: 0; margin-bottom: 0; margin-top: 0;" # Eliminamos márgenes
+                   )
                  )
                )
              )
            ),
-           
            # Sección 5: Mecanismos
            # Sección 5: Mecanismos
            "mecanismos" = div(
@@ -426,13 +471,13 @@ server <- function(input, output, session) {
                          
                          div(class = "alert alert-success",
                              h5("Transparencia por convicción, no por obligación."),
-                             p("Cada algoritmo, cada gráfico y cada conclusión de esta investigación puede ser inspeccionada, cuestionada y mejorada. Creemos que el conocimiento científico debe ser accesible, verificable y construido colaborativamente, permitiendo que cualquier persona pueda revisar, replicar y perfeccionar nuestro trabajo."),
+                             p("Cada algoritmo, cada gráfico y cada conclusión de esta investigación puede ser inspeccionada, cuestionada y mejorada. Creemos que el conocimiento científico debe ser accesible, verificable y construido colaborativamente, permitiendo que cualquier persona pueda revisar, replicar y perfeccionar nuestro trabajo.
+                               a través del softare libre. Consulta el código completo en:"),
                              # p("Usamos software libre porque la ciencia libre construye sociedades libres. Porque la ciencia que no se puede verificar, no es ciencia."),
                              
                              # Sección del código fuente
                              div(class = "d-flex align-items-center flex-wrap mb-3",
                                  div(class = "me-3 mb-2",
-                                     p(class = "mb-0", "Consulta el código completo:"),
                                      a(href = "https://github.com/useReconomist/INSTITUTO-DE-GEOGRAF-A-UNAM-DIP-GEO", 
                                        target = "_blank",
                                        class = "btn btn-outline-dark btn-sm",
@@ -440,7 +485,7 @@ server <- function(input, output, session) {
                                        " Ver en GitHub")
                                  ),
                                  div(class = "mb-2",
-                                     p(class = "mb-1 small", "Escanea el código QR:"),
+                                     p(class = "mb-1 small", "accede al código"),
                                      img(src = "qr.svg", 
                                          style = "max-width: 90px; height: auto;",
                                          alt = "Código QR para acceder al repositorio")
@@ -467,7 +512,7 @@ server <- function(input, output, session) {
                              ),
                              div(class = "card-body",
                                  h6("Autores"),
-                                 p(icon("user"), "Erandy",icon("envelope"), href = "mailto:participante4@email.com",icon("twitter"),icon("linkedin"), class = "small"),
+                                 p(icon("user"), "Erandi Jiménez Jacques",icon("envelope"), href = "mailto:participante4@email.com",icon("twitter"),icon("linkedin"), class = "small"),
                                  p(icon("user"), "Manuel",icon("envelope"), href = "mailto:participante4@email.com",icon("twitter"),icon("linkedin"), class = "small"),
                                  p(icon("user"), "Verónica",icon("envelope"), href = "mailto:participante4@email.com",icon("twitter"),icon("linkedin"), class = "small"),
                                  p(icon("user"), "Noé Osorio García",icon("envelope"), href = "mailto:participante4@email.com",icon("twitter"),icon("linkedin"), class = "small"),
@@ -529,7 +574,7 @@ server <- function(input, output, session) {
   output$mapa_historico = renderLeaflet({
     leaflet() %>% 
       addProviderTiles(providers$OpenStreetMap) %>% 
-      addMiniMap()
+      addCircles(lat = 19.432411,lng = -99.1359976) 
   })
 }
 
