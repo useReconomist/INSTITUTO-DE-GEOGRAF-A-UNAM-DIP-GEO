@@ -21,7 +21,10 @@ ui <- page_sidebar(
       img(src = "ig_logo.svg", height = "30px"),
       class = "logo-link"
     ),
-    tags$strong("Espacios de Excepción - Análisis Territorial"),
+    tags$strong(
+      "Espacios de Excepción - Análisis Territorial",
+      style = "color: white; font-weight: bold;"
+    ),
     style = "display: flex; align-items: center; gap: 10px;"
   ),
   tags$head(
@@ -32,6 +35,38 @@ ui <- page_sidebar(
       }
       .logo-link:hover {
         opacity: 0.8;
+      }
+      
+      /* Estilos para la barra superior - múltiples selectores */
+      .navbar, .navbar-brand, .bslib-page-title, 
+      .navbar-light, .bg-light, .navbar-expand {
+        background-color: #5a9c9e !important;
+        color: white !important;
+        font-weight: bold !important;
+      }
+      
+      /* Contenedor principal del título */
+      .container-fluid {
+        background-color: #5a9c9e !important;
+      }
+      
+      /* Header completo */
+      header {
+        background-color: #5a9c9e !important;
+        color: white !important;
+        font-weight: bold !important;
+      }
+      
+      /* Todo el contenido del header */
+      header * {
+        color: white !important;
+        font-weight: bold !important;
+      }
+      
+      /* Selector más específico para el título de la página */
+      .bslib-sidebar-layout > .navbar {
+        background-color: #5a9c9e !important;
+        border-color: #5a9c9e !important;
       }
     "))
   ),
@@ -70,6 +105,55 @@ ui <- page_sidebar(
 )
 
 server <- function(input, output, session) {
+  
+  showModal(
+    modalDialog(
+      div(
+        style = "text-align: center; position: relative; z-index: 2; padding: 20px;",
+        tags$img(src = "pleca_head.png", width = "450px", height = "auto"),
+        tags$div(
+          HTML("
+<strong>Bienvenido</strong><br><br>
+
+Algo de texto<br>
+con información de la fgj<br>
+You can change the position by clicking again on an area of interest and pressing 'Query' again<br><br>
+<em>Propuesta.</em><br>
+<em>The platform is still under development so many features will be integrated over time.</em>
+        ")
+        )
+      ),
+      easyClose = TRUE,
+      footer = modalButton("ok"),
+      # Aquí aplicamos el CSS al modal completo
+      tags$head(
+        tags$style(HTML("
+        .modal-content {
+          background-image: url('fondo_volcanes.png') !important;
+          background-size: cover !important;
+          background-position: center !important;
+          background-repeat: no-repeat !important;
+          position: relative !important;
+        }
+        .modal-content::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(255, 255, 255, 0.8);
+          z-index: 1;
+        }
+        .modal-header, .modal-body, .modal-footer {
+          position: relative;
+          z-index: 2;
+        }
+      "))
+      )
+    )
+  )
+  
   
   # Actualizar barra de progreso según la sección
   observe({
@@ -361,7 +445,7 @@ server <- function(input, output, session) {
                    card(
                      full_screen = TRUE,
                      card_header(
-                       icon("scatter-chart"), " Correlación"
+                       " Correlación"
                      ),
                      card_body(
                        plotOutput("grafico3", height = "100%"),
@@ -373,7 +457,6 @@ server <- function(input, output, session) {
                )
              )
            ),
-           # Sección 5: Mecanismos
            # Sección 5: Mecanismos
            "mecanismos" = div(
              card(
